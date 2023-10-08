@@ -1,0 +1,266 @@
+package com.gymapp.gym.social;
+
+import com.gymapp.gym.plans.plan_progression.PlanProgression;
+import com.gymapp.gym.plans.plan_progression.PlanProgressionDto;
+import com.gymapp.gym.plans.plan_progression.PlanProgressionService;
+import com.gymapp.gym.profile.Profile;
+import com.gymapp.gym.profile.ProfileDto;
+import com.gymapp.gym.profile.ProfileService;
+import com.gymapp.gym.social.friendshipRequest.FriendShipRequestDto;
+import com.gymapp.gym.social.friendshipRequest.FriendshipRequest;
+import com.gymapp.gym.social.friendshipRequest.FriendshipRequestService;
+import com.gymapp.gym.social.friendshipRequest.FriendshipStatus;
+import com.gymapp.gym.user.User;
+import com.gymapp.gym.user.UserDto;
+import com.gymapp.gym.user.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class SocialService {
+    @Autowired
+    private SocialRepository repository;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private SocialService socialService;
+    @Autowired
+    private FriendshipRequestService friendshipRequestService;
+    @Autowired
+    private PlanProgressionService planProgressionService;
+    @Autowired
+    private ProfileService profileService;
+
+
+    public Social getById(int socialId) {
+        Social social = repository.getById(socialId);
+        return social;
+    }
+
+    public Social getByUserId(int userId) {
+        return repository.getByUserId(userId);
+    }
+
+    public SocialDto getOrCreateSocialForUser(@NotNull HttpServletRequest request) {
+        final String email = request.getHeader("Email");
+        User user = userService.getUserByEmail(email);
+
+        if (user == null) {
+            throw new IllegalArgumentException("User not found.");
+        }
+
+        Social socialByUser = repository.getByUserId(user.getId());
+
+        if (socialByUser != null) {
+            return toDto(socialByUser);
+        }
+
+        int randomSocialId = generateRandomSocialId();
+        Social newSocial = Social.builder().user(user).id(randomSocialId).build();
+
+        repository.save(newSocial);
+
+        return toDto(newSocial);
+    }
+
+    public SocialDto addFriendForUser(@NotNull HttpServletRequest request, @RequestBody int friendSocialId) {
+        final String email = request.getHeader("Email");
+        User user = userService.getUserByEmail(email);
+
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        Social userSocial = socialService.getByUserId(user.getId());
+
+        if (userSocial == null) {
+            throw new IllegalArgumentException("User without social tried to add a friend");
+        }
+
+        Optional<Social> optionalFriendSocial = repository.findById(friendSocialId);
+
+        if (optionalFriendSocial.isEmpty()) {
+            return SocialDto.builder().errorMessage("Found no social id by: " + friendSocialId).build();
+        }
+
+        Social friendSocial = optionalFriendSocial.get();
+
+        if (userSocial.getFriends().contains(friendSocial)) {
+            return SocialDto.builder().errorMessage("You are already friends with this user").build();
+        }
+
+        Optional<FriendshipRequest> existingFriendShipRequest = friendshipRequestService.getFriendShipRequestByReceiverAndSender(userSocial, friendSocial);
+
+        if (existingFriendShipRequest.isPresent()) {
+            friendshipRequestService.acceptFriendshipRequestByUsers(userSocial.getId(), friendSocial.getId());
+            userSocial.getFriends().add(friendSocial);
+            repository.save(userSocial);
+            return SocialDto.builder().build();
+        }
+
+        User friend = userService.getUserByEmail(friendSocial.getUser().getEmail());
+
+
+        if (friend != null) {
+            friendshipRequestService.createFriendShipRequest(userSocial.getId(), friendSocialId);
+        }
+
+        return toDto(userSocial);
+    }
+
+    public SocialDto acceptFriendshipRequestForUser(@NotNull HttpServletRequest request, @RequestBody int friendSocialId) {
+        final String email = request.getHeader("Email");
+        User user = userService.getUserByEmail(email);
+
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        Social userSocial = repository.getByUserId(user.getId());
+
+        if (userSocial == null) {
+            throw new IllegalArgumentException("User without social tried to accept a friend");
+        }
+
+        Social friendSocial = repository.getById(friendSocialId);
+
+        if (friendSocial.getId() == null) {
+            return SocialDto.builder().errorMessage("Friend doesn't exist by social id: " + friendSocialId).build();
+        }
+
+        Optional<FriendshipRequest> existingFriendShipRequest = friendshipRequestService.getFriendShipRequestByReceiverAndSender(userSocial, friendSocial);
+
+        if (existingFriendShipRequest.isEmpty()) {
+            return SocialDto.builder().errorMessage("No friend request is pending with friend: " + friendSocial.getId()).build();
+        }
+
+        if (existingFriendShipRequest.get().getStatus().equals(FriendshipStatus.ACCEPTED)) {
+            return SocialDto.builder().errorMessage("You are already friends with this user with social id: " + friendSocial.getId()).build();
+        }
+
+       FriendshipRequest friendshipRequest = friendshipRequestService.acceptFriendshipRequestByUsers(userSocial.getId(), friendSocial.getId());
+
+        if (friendshipRequest == null) {
+            return SocialDto.builder().errorMessage("There is no friend request pending").build();
+        }
+
+        userSocial.getFriends().add(friendSocial);
+
+        repository.save(userSocial);
+
+        return toDto(userSocial);
+    }
+
+
+    public SocialDto toDto(Social social) {
+        if (social == null) {
+            return null;
+        }
+
+        SocialDto socialDto = new SocialDto();
+        socialDto.setUserSocialId(social.getId());
+
+        User user = social.getUser();
+        UserDto userDto = new UserDto();
+        userDto.setEmail(user.getEmail());
+        userDto.setRole(user.getRole());
+        userDto.setLevel(user.getLevel());
+
+        ProfileDto profileDto = new ProfileDto();
+        Profile userProfile = profileService.getByUserId(user.getId());
+
+        if (userProfile != null) {
+            profileDto.setGender(userProfile.getGender());
+            profileDto.setLanguage(userProfile.getLanguage());
+            profileDto.setNationality(userProfile.getNationality());
+            profileDto.setDateOfBirth(userProfile.getDateOfBirth());
+            profileDto.setDisplayName(userProfile.getDisplayName());
+            socialDto.setProfileInfo(profileDto);
+        }
+
+        Set<FriendshipRequest> allFriendRequests = friendshipRequestService.getFriendRequestsByUserAndStatus(social.getId(), FriendshipStatus.PENDING);
+
+        if (!allFriendRequests.isEmpty()) {
+            FriendShipRequestDto friendShipRequestDto = new FriendShipRequestDto();
+            Set<UserDto> senderDtos = allFriendRequests.stream()
+                    .map(FriendshipRequest::getSender)
+                    .map(sender -> {
+                        UserDto senderDto = new UserDto();
+                        senderDto.setSocialId(sender.getId());
+                        senderDto.setEmail(sender.getUser().getEmail());
+                        senderDto.setRole(sender.getUser().getRole());
+                        senderDto.setLevel(sender.getUser().getLevel());
+                        return senderDto;
+                    })
+                    .collect(Collectors.toSet());
+
+            friendShipRequestDto.setUserInfo(senderDtos);
+            socialDto.setFriendRequests(friendShipRequestDto);
+        }
+
+        PlanProgression userPlanProgression = planProgressionService.getPlanProgressionByUserId(user.getId());
+
+        if (userPlanProgression != null) {
+            PlanProgressionDto planProgressionDto = new PlanProgressionDto();
+            planProgressionDto.setDay(userPlanProgression.getDay());
+            planProgressionDto.setPlan(userPlanProgression.getPlan());
+            socialDto.setPlanProgressionDto(planProgressionDto);
+        }
+
+        socialDto.setUserInfo(userDto);
+
+        Set<SocialFriendsDto> socialFriends = new HashSet<>();
+        for (Social friend : social.getFriends()) {
+
+            User friendUser = friend.getUser();
+            UserDto friendDto = new UserDto();
+            friendDto.setLevel(friendUser.getLevel());
+            friendDto.setEmail(friendUser.getEmail());
+            friendDto.setRole(friendUser.getRole());
+            SocialFriendsDto socialFriendsDto = new SocialFriendsDto();
+            socialFriendsDto.setUserSocialId(friend.getId());
+            socialFriendsDto.setUserInfo(friendDto);
+            socialFriends.add(socialFriendsDto);
+
+            ProfileDto socialProfileDto = new ProfileDto();
+            Profile friendProfile = profileService.getByUserId(friendUser.getId());
+
+            if (friendProfile != null) {
+                socialProfileDto.setGender(friendProfile.getGender());
+                socialProfileDto.setLanguage(friendProfile.getLanguage());
+                socialProfileDto.setNationality(friendProfile.getNationality());
+                socialProfileDto.setDateOfBirth(friendProfile.getDateOfBirth());
+                socialProfileDto.setDisplayName(friendProfile.getDisplayName());
+                socialFriendsDto.setProfileDto(socialProfileDto);
+            }
+
+            PlanProgression friendPlanProgression = planProgressionService.getPlanProgressionByUserId(friendUser.getId());
+
+            if (friendPlanProgression != null) {
+                PlanProgressionDto friendPlanProgressionDto = new PlanProgressionDto();
+                friendPlanProgressionDto.setDay(friendPlanProgression.getDay());
+                friendPlanProgressionDto.setPlan(friendPlanProgression.getPlan());
+
+                socialFriendsDto.setPlanProgressionDto(friendPlanProgressionDto);
+            }
+
+        }
+
+        socialDto.setFriends(socialFriends);
+
+        return socialDto;
+    }
+
+    private int generateRandomSocialId() {
+        Random random = new Random();
+        return 1000 + random.nextInt(9000);
+    }
+}

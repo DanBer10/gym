@@ -1,8 +1,9 @@
 package com.gymapp.gym.user;
 
+import com.gymapp.gym.JWT.JwtService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -10,42 +11,34 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
 
+    @Autowired
     private final UserRepository repo;
     private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private final JwtService jwtService;
 
 
-    public User getUserByDisplayName (@NonNull String displayName) {
-        return repo.getUserByDisplayName(displayName);
+    public User getUserByEmail(@NonNull String email) {
+        return repo.getUserByEmail(email);
     }
 
 
-    public ResponseEntity<User> updateUserEmail (@NonNull User user, @NonNull String newEmail) {
-
+    public String updateUserEmail (@NonNull User user, @NonNull String newEmail) {
         user.setEmail(newEmail);
         repo.save(user);
 
-        return ResponseEntity.ok().build();
+        return jwtService.generateToken(user);
     }
 
-    public ResponseEntity<User> updateUserPassword(@NonNull User user, @NonNull String newPassword) {
+
+    public void updateUserPassword(@NonNull User user, @NonNull String newPassword) {
         String newEncryptedPassword = passwordEncoder.encode(newPassword);
         user.setPassword(newEncryptedPassword);
         repo.save(user);
-
-        return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<User> updateUserLanguage(@NonNull User user, @NonNull String language) {
-        user.setLanguage(language);
-        repo.save(user);
-
-        return ResponseEntity.ok().build();
-    }
-
-    public ResponseEntity<User> getUserById(@NonNull Integer userId) {
-        repo.getReferenceById(userId);
-
-        return ResponseEntity.ok().build();
+    public User getUserById(@NonNull Integer userId) {
+        return repo.getReferenceById(userId);
     }
 
 

@@ -13,4 +13,5 @@ import java.util.List;
 @NoArgsConstructor
 public class NewsResponse {
     private List<News> newsList;
+    private String errorMessage;
 }

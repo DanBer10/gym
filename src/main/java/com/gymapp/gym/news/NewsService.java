@@ -12,6 +12,9 @@ public class NewsService {
 
     public NewsResponse getNews() {
         List<News> newsList = repository.findAll();
+        if (newsList.isEmpty()) {
+            return NewsResponse.builder().errorMessage("No news available").build();
+        }
         return NewsResponse.builder().newsList(newsList).build();
     }
 }

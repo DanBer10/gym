@@ -1,58 +1,75 @@
 package com.gymapp.gym.payments;
 
-import com.stripe.exception.*;
-import com.stripe.model.Charge;
+import com.gymapp.gym.profile.ProfileService;
+import com.gymapp.gym.subscription.SubscriptionService;
+import com.gymapp.gym.user.User;
+import com.gymapp.gym.user.UserService;
+import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
+import com.stripe.model.PaymentIntent;
+import com.stripe.param.CustomerCreateParams;
+import com.stripe.param.PaymentIntentCreateParams;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import com.stripe.Stripe;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class CheckoutService {
+    private static final String EMAIL_HEADER = "Email";
+    private static final String DISPLAY_NAME_NULL_ERROR = "Display name is null";
+    private static final String USER_NULL_ERROR = "User is null";
+    private static final String PAYMENT_INITIALIZED_MESSAGE = "Payment initialized";
+    @Autowired
+    private final SubscriptionService subscriptionService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private ProfileService profileService;
+
     @Value("${spring.stripe.secret-key}")
     private String stripeSecretKey;
+
+
 
     @PostConstruct
     public void init() {
         Stripe.apiKey = stripeSecretKey;
     }
+
     public String getStripeKey() {
         return stripeSecretKey;
     }
 
-    public ResponseEntity<String> charge(ChargeRequest chargeRequest)
-            throws AuthenticationException, InvalidRequestException,
-            ApiConnectionException, CardException, ApiException, com.stripe.exception.AuthenticationException {
+    public CheckoutResponse createPaymentIntent(String stripeToken, HttpServletRequest request) throws StripeException {
+        final String email = request.getHeader("Email");
+        User user = userService.getUserByEmail(email);
+        String displayName = profileService.getProfileName(user);
+        // Create a customer using the provided Stripe token
+        Customer customer = Customer.create(new CustomerCreateParams.Builder()
+                .setEmail(email)
+                .setName(displayName)
+                .setSource(stripeToken)
+                .build());
 
-        try {
-            Customer customer = Customer.create(Map.of(
-                    "name", chargeRequest.getCustomerDisplayName(),
-                    "email", chargeRequest.getStripeEmail(),
-                    "source", chargeRequest.getStripeToken()
-            ));
+        long amount = 15000;
+        String currency = "SEK";
 
-            Map<String, Object> chargeParams = new HashMap<>();
-            chargeParams.put("amount", chargeRequest.getAmount());
-            chargeParams.put("currency", chargeRequest.getCurrency());
-            chargeParams.put("description", chargeRequest.getDescription());
-            chargeParams.put("customer", customer.getId());
-            // Handle the charge response as needed
-            Charge charge = Charge.create(chargeParams);
+        PaymentIntentCreateParams paymentIntentParams = PaymentIntentCreateParams.builder()
+                .setAmount(amount)
+                .setCurrency(currency)
+                .setReceiptEmail(email)
+                .setCustomer(customer.getId())
+                .build();
 
-            return ResponseEntity.ok(charge.getId());
-        } catch (StripeException e) {
-            // Handle the StripeException
-            throw new RuntimeException("Failed to create charge");
+        PaymentIntent paymentIntent = PaymentIntent.create(paymentIntentParams);
 
-        }
+        return CheckoutResponse.builder().clientSecret(paymentIntent.getClientSecret()).build();
     }
+
+
 }

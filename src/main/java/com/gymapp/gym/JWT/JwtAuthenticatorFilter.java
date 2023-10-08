@@ -26,28 +26,26 @@ public class JwtAuthenticatorFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String displayName;
-
 
         // Allow registration requests to pass through without authentication
-        if(request.getRequestURI().equals("/api/v1/auth/register")) {
+        if (request.getRequestURI().equals("/api/v1/auth/register")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+        final String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        jwt = authHeader.substring(7).trim();
-        displayName = jwtService.extractUsername(jwt);
+        String jwt = authHeader.substring(7).trim();
+        String email = jwtService.extractUsername(jwt);
 
-        // If user not authenticated already
-        if (displayName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(displayName);
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
+
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
@@ -68,4 +66,6 @@ public class JwtAuthenticatorFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
- }
+}
+
+

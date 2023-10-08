@@ -1,7 +1,5 @@
 package com.gymapp.gym.auth;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,8 +18,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> register(
             @RequestBody RegisterRequest request
     ) {
-       service.register(request);
-       return ResponseEntity.ok().build();
+       return ResponseEntity.ok(service.register(request));
     }
 
     @PostMapping("/authenticate")

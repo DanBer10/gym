@@ -1,9 +1,8 @@
 package com.gymapp.gym.payments;
 
 import com.stripe.exception.StripeException;
-import com.stripe.model.Charge;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,12 +18,9 @@ public class CheckoutController {
         return ResponseEntity.ok(service.getStripeKey());
     }
 
-    @PostMapping("/charge")
-    public ResponseEntity<?> charge(@RequestBody ChargeRequest chargeRequest) {
-        try {
-            return ResponseEntity.ok(service.charge(chargeRequest));
-        } catch (StripeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    @PostMapping("/createPaymentIntent")
+    public ResponseEntity<CheckoutResponse> getPaymentIntent(@RequestBody String stripeToken, HttpServletRequest httpServletRequest) throws StripeException {
+        return ResponseEntity.ok(service.createPaymentIntent(stripeToken, httpServletRequest));
     }
+
 }

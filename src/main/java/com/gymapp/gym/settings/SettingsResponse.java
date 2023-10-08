@@ -1,7 +1,5 @@
-package com.gymapp.gym.Settings;
+package com.gymapp.gym.settings;
 
-import com.gymapp.gym.profile.Profile;
-import com.gymapp.gym.profile.ProfileDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,10 +13,11 @@ import lombok.NoArgsConstructor;
 public class SettingsResponse {
     private String errorMessage;
     private String successMessage;
+    private String jwtToken;
+    private String userLanguage;
 
     // Constructor for error response
     public SettingsResponse(String errorMessage) {
         this.errorMessage = errorMessage;
     }
-
 }

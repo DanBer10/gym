@@ -1,10 +1,12 @@
 package com.gymapp.gym.payments;
 
+import com.gymapp.gym.user.User;
 import com.gymapp.gym.user.UserService;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
 import com.stripe.net.Webhook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ public class WebhookController {
     @Value("${spring.stripe.webhook-key}")
     private String endpointSecret;
 
+    @Autowired
     private UserService userService;
 
     @PostMapping
@@ -33,7 +36,9 @@ public class WebhookController {
                     if (paymentIntent != null) {
                         String customerId = paymentIntent.getCustomer();
                         // TODO check this
-                        userService.getUserById(Integer.valueOf(customerId));
+                        User user = userService.getUserById(Integer.valueOf(customerId));
+
+
                     }
                     break;
                 default:

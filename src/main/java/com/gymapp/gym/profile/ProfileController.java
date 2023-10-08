@@ -1,8 +1,7 @@
 package com.gymapp.gym.profile;
 
-import com.gymapp.gym.JWT.JwtService;
+
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +20,6 @@ public class ProfileController {
 
     @PostMapping("/create-profile")
     public ResponseEntity<ProfileResponse> createProfile(@RequestBody ProfileDto profileForm, HttpServletRequest httpServletRequest) {
-        return ResponseEntity.ok(service.createProfile(httpServletRequest, profileForm));
+            return ResponseEntity.ok(service.createProfile(httpServletRequest, profileForm));
     }
 }

@@ -22,13 +22,11 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue
     private Integer id;
-    private String displayName;
     private String email;
     private String password;
-    private String language;
     @Enumerated(EnumType.STRING)
     private Role role;
-    private String subscribed;
+    private Level level = Level.BRONZE;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -37,7 +35,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.displayName;
+        return this.email;
     }
 
     @Override

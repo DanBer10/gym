@@ -14,11 +14,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "_news")
+@Table(name = "news")
 public class News {
     @Id
     @GeneratedValue
     private Integer id;
-    private String title;
     private String body;
+    private String title;
+
 }
