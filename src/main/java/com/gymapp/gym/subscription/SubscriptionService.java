@@ -68,7 +68,7 @@ public class SubscriptionService {
             final String emailText = "As a verified member, you can unlock exciting features such as exclusive subscriptions and access to premium content. Start exploring the full range of possibilities today!";
 
 
-            emailService.sendEmail(user.getEmail(),emailSubject, emailText);
+            emailService.addToEmailQueue(user.getEmail(),emailSubject, emailText);
         }
     }
 

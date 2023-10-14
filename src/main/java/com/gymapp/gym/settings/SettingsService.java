@@ -134,13 +134,12 @@ public class SettingsService {
            throw new IllegalAccessException("This user has no settings associated");
         }
 
-
         final int verificationCode = checkoutTokenService.createCheckoutTokenForUser(user).getToken();
         final String mailSubject = "Your Verification Code " + verificationCode;
         final String mailText = "Click the link below to verify your email please <a href='http://localhost:4200/verify/" + verificationCode + "'>Verify Email</a>";
 
         if (verificationCode > 100) {
-            emailService.sendEmail(user.getEmail(), mailSubject, mailText);
+            emailService.addToEmailQueue(user.getEmail(), mailSubject, mailText);
         }
 
         return new SettingsResponse.SettingsResponseBuilder().successMessage("Email verification email sent successfully!").build();

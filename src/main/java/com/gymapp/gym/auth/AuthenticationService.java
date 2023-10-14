@@ -33,15 +33,15 @@ public class AuthenticationService {
 
 
     public AuthenticationResponse register(RegisterRequest request) {
-            var user = User.builder().email(request.getEmail()).password(passwordEncoder.encode(request.getPassword())).role(Role.USER).level(Level.BRONZE).build();
-            if (repository.findUserByEmail(user.getEmail()).isPresent()) {
-                return AuthenticationResponse.builder().emailError("This email is already taken, please try another email").build();
-            }
-            repository.save(user);
-            subscriptionService.subscribeToBasic(user.getEmail());
+        var user = User.builder().email(request.getEmail()).password(passwordEncoder.encode(request.getPassword())).role(Role.USER).level(Level.BRONZE).build();
+        if (repository.findUserByEmail(user.getEmail()).isPresent()) {
+            return AuthenticationResponse.builder().emailError("This email is already taken, please try another email").build();
+        }
+        repository.save(user);
+        subscriptionService.subscribeToBasic(user.getEmail());
         String welcomeText = "Welcome aboard! 🌟 We're absolutely delighted to have you here! 🥳";
         String welcomeSubject = "Welcome to gym planet!🥳";
-        emailService.sendEmail(user.getEmail(), welcomeSubject, welcomeText);
+        emailService.addToEmailQueue(user.getEmail(), welcomeSubject, welcomeText);
 
         return AuthenticationResponse.builder().successMessage("Registered user successfully").email(user.getEmail()).build();
     }
