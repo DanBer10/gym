@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://gym_db_d6a7_user:29kp0jCJ1EOahjGYXMjmyzGR94NXSXZ7@dpg-ckujf4jamefc738u2fcg-a/gym_db_d6a7
+    url: jdbc:postgresql://dpg-ckujf4jamefc738u2fcg-a.frankfurt-postgres.render.com:5432/gym_db_d6a7
     username: gym_db_d6a7_user
     password: 29kp0jCJ1EOahjGYXMjmyzGR94NXSXZ7
     driver-class-name: org.postgresql.Driver
