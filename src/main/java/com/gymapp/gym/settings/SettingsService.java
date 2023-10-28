@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,9 @@ public class SettingsService {
     private final EmailService emailService;
     @Autowired
     private final CheckoutTokenService checkoutTokenService;
+
+    @Value("${verification.url}")
+    private String verificationUrl;
 
     public SettingsResponse updateEmail(HttpServletRequest request, @NonNull String newEmail) {
         final String email = request.getHeader("email");
@@ -136,7 +140,7 @@ public class SettingsService {
 
         final int verificationCode = checkoutTokenService.createCheckoutTokenForUser(user).getToken();
         final String mailSubject = "Verify your email";
-        final String mailText = "Click the link below to verify your email please <a href='http://localhost:4200/verify/" + verificationCode + "'>Verify Email</a>";
+        final String mailText = "Click the link below to verify your email please <a href='" + verificationUrl + verificationCode + "'>Verify Email</a>";
 
         if (verificationCode > 100) {
             emailService.addToEmailQueue(user.getEmail(), mailSubject, mailText);
