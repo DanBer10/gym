@@ -27,6 +27,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
     private Level level = Level.BRONZE;
+    private String profileImageUrl;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

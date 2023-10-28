@@ -222,6 +222,7 @@ public class SocialService {
         userDto.setEmail(user.getEmail());
         userDto.setRole(user.getRole());
         userDto.setLevel(user.getLevel());
+        userDto.setProfileImageUrl(user.getProfileImageUrl());
 
         ProfileDto profileDto = new ProfileDto();
         Profile userProfile = profileService.getByUserId(user.getId());
@@ -247,6 +248,7 @@ public class SocialService {
                         senderDto.setEmail(sender.getUser().getEmail());
                         senderDto.setRole(sender.getUser().getRole());
                         senderDto.setLevel(sender.getUser().getLevel());
+                        senderDto.setProfileImageUrl(sender.getUser().getProfileImageUrl());
                         ProfileDto senderProfileDto = new ProfileDto();
                         Profile senderProfile = profileService.getByUserId(sender.getId());
                         if (senderProfile != null) {

@@ -33,7 +33,7 @@ public class AuthenticationService {
 
 
     public AuthenticationResponse register(RegisterRequest request) {
-        var user = User.builder().email(request.getEmail()).password(passwordEncoder.encode(request.getPassword())).role(Role.USER).level(Level.BRONZE).build();
+        var user = User.builder().email(request.getEmail().toLowerCase()).password(passwordEncoder.encode(request.getPassword())).role(Role.USER).level(Level.BRONZE).build();
         if (repository.findUserByEmail(user.getEmail()).isPresent()) {
             return AuthenticationResponse.builder().emailError("This email is already taken, please try another email").build();
         }
@@ -50,7 +50,7 @@ public class AuthenticationService {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
+                            request.getEmail().toLowerCase(),
                             request.getPassword()
                     )
             );

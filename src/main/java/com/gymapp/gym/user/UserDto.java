@@ -18,4 +18,5 @@ public class UserDto {
     private Level level;
     private int socialId;
     private ProfileDto profileDto;
+    private String profileImageUrl;
 }

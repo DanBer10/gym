@@ -1,9 +1,11 @@
 package com.gymapp.gym.user;
 
 import com.gymapp.gym.JWT.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,38 @@ public class UserService {
         return repo.getUserByEmail(email);
     }
 
+    public UserDto getUserInformation(HttpServletRequest request) {
+        final String email = request.getHeader("Email");
+        User user = repo.getUserByEmail(email);
+
+        if (user == null) {
+            throw new RuntimeException("User can't be null when fetching user information");
+        }
+
+        UserDto userDto = new UserDto();
+        userDto.setEmail(email);
+        userDto.setLevel(user.getLevel());
+        userDto.setRole(user.getRole());
+        userDto.setProfileImageUrl(user.getProfileImageUrl());
+
+        return userDto;
+    }
+
+    public ResponseEntity<String> updateUserImageUrl(HttpServletRequest request, String profileImageUrl) {
+        final String email = request.getHeader("Email");
+        User user = repo.getUserByEmail(email);
+
+        if (user == null) {
+            throw new RuntimeException("User can't be null when fetching user information");
+        }
+
+        if (profileImageUrl != null) {
+            user.setProfileImageUrl(profileImageUrl);
+            repo.save(user);
+        }
+
+        return ResponseEntity.ok().build();
+    }
 
     public String updateUserEmail (@NonNull User user, @NonNull String newEmail) {
         user.setEmail(newEmail);
