@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://gympl.cyqap2u2cctk.eu-north-1.rds.amazonaws.com/gympl
+    url: postgres://gym_db_d6a7_user:29kp0jCJ1EOahjGYXMjmyzGR94NXSXZ7@dpg-ckujf4jamefc738u2fcg-a/gym_db_d6a7
     username: postgres
     password: rootroot
     driver-class-name: org.postgresql.Driver
@@ -32,5 +32,3 @@ spring:
       org.hibernate.SQL: DEBUG
   main:
     allow-circular-references: true
-server:
-  port: 5000
