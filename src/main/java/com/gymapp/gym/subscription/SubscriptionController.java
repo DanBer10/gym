@@ -18,12 +18,7 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
     @GetMapping("subscription-state")
     public ResponseEntity<Subscription> getSubscription(HttpServletRequest request) throws UserNotFoundException {
-        try {
-            Subscription subscription = subscriptionService.getStatus(request);
-            return ResponseEntity.ok(subscription);
-        } catch (Exception e) {
-            throw new UserNotFoundException();
-        }
+            return ResponseEntity.ok(subscriptionService.getStatus(request));
     }
 
 }

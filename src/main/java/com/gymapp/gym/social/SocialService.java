@@ -6,6 +6,9 @@ import com.gymapp.gym.plans.plan_progression.PlanProgressionService;
 import com.gymapp.gym.profile.Profile;
 import com.gymapp.gym.profile.ProfileDto;
 import com.gymapp.gym.profile.ProfileService;
+import com.gymapp.gym.progress.Progress;
+import com.gymapp.gym.progress.ProgressDto;
+import com.gymapp.gym.progress.ProgressService;
 import com.gymapp.gym.social.friendshipRequest.FriendShipRequestDto;
 import com.gymapp.gym.social.friendshipRequest.FriendshipRequest;
 import com.gymapp.gym.social.friendshipRequest.FriendshipRequestService;
@@ -18,7 +21,9 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,6 +43,8 @@ public class SocialService {
     private PlanProgressionService planProgressionService;
     @Autowired
     private ProfileService profileService;
+    @Autowired
+    private ProgressService progressService;
 
 
     public Social getById(int socialId) {
@@ -160,6 +167,48 @@ public class SocialService {
     }
 
 
+    public List<ProgressDto> getProgressOfFriend(HttpServletRequest request, int friendSocialId) {
+        final String email = request.getHeader("Email");
+        User user = userService.getUserByEmail(email);
+
+        if (user == null) {
+            throw new IllegalArgumentException("User doesn't exist");
+        }
+
+        Social social = socialService.getById(friendSocialId);
+
+        if (social == null) {
+            throw new IllegalArgumentException("Social doesn't exist");
+        }
+
+        Profile profile = profileService.getByUserId(social.getUser().getId());
+
+        if (profile == null) {
+            throw new IllegalArgumentException("Profile doesn't exist");
+        }
+
+        List<Progress> progress = progressService.getAllProgressByProfileId(profile.getId());
+
+        if (progress == null) {
+            throw new IllegalArgumentException("Progress doesn't exist");
+        }
+
+        List<ProgressDto> progressDtoList = new ArrayList<>();
+        progress.forEach(pr -> {
+            ProgressDto progressDto = new ProgressDto();
+            progressDto.setSets(pr.getSets());
+            progressDto.setReps(pr.getReps());
+            progressDto.setWeight(pr.getWeight());
+            progressDto.setExerciseType(pr.getExerciseType());
+            progressDto.setDistance(pr.getDistance());
+            progressDto.setTime(pr.getTime());
+            progressDtoList.add(progressDto);
+        });
+
+        return progressDtoList;
+    }
+
+
     public SocialDto toDto(Social social) {
         if (social == null) {
             return null;
@@ -198,6 +247,12 @@ public class SocialService {
                         senderDto.setEmail(sender.getUser().getEmail());
                         senderDto.setRole(sender.getUser().getRole());
                         senderDto.setLevel(sender.getUser().getLevel());
+                        ProfileDto senderProfileDto = new ProfileDto();
+                        Profile senderProfile = profileService.getByUserId(sender.getId());
+                        if (senderProfile != null) {
+                            senderProfileDto.setDisplayName(senderProfile.getDisplayName());
+                        }
+                        senderDto.setProfileDto(senderProfileDto);
                         return senderDto;
                     })
                     .collect(Collectors.toSet());

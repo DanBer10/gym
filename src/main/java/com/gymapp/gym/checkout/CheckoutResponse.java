@@ -1,4 +1,4 @@
-package com.gymapp.gym.payments;
+package com.gymapp.gym.checkout;
 
 import com.stripe.model.PaymentIntent;
 import lombok.AllArgsConstructor;

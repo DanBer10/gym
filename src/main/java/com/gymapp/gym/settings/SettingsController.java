@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/account-settings")
 public class SettingsController {
     @Autowired
-    SettingsService settingsService;
+    private SettingsService settingsService;
 
     @GetMapping
     public ResponseEntity<SettingsDto> settings(HttpServletRequest request) {

@@ -99,7 +99,6 @@ public class ProfileService {
         profileDto.setDateOfBirth(profile.getDateOfBirth());
         profileDto.setFitnessGoals(profile.getFitnessGoals());
 
-
         return profileDto;
     }
 

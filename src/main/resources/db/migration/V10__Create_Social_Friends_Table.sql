@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS social_friends (
     id SERIAL PRIMARY KEY,
-    social_id INT NOT NULL,
-    friend_social_id INT NOT NULL,
+    social_id INT NULL,
+    friend_social_id INT NULL,
     FOREIGN KEY (social_id) REFERENCES social (id),
     FOREIGN KEY (friend_social_id) REFERENCES social (id)
 );

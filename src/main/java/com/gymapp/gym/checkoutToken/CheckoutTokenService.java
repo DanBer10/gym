@@ -1,7 +1,5 @@
 package com.gymapp.gym.checkoutToken;
 
-import com.gymapp.gym.settings.Settings;
-import com.gymapp.gym.settings.SettingsService;
 import com.gymapp.gym.subscription.Subscription;
 import com.gymapp.gym.subscription.SubscriptionService;
 import com.gymapp.gym.user.User;
@@ -15,13 +13,10 @@ import java.util.Random;
 
 @Service
 public class CheckoutTokenService {
-
     @Autowired
     private UserService userService;
     @Autowired
     private CheckoutTokenRepository repository;
-    @Autowired
-    private SettingsService settingsService;
     @Autowired
     private SubscriptionService subscriptionService;
 
@@ -54,17 +49,13 @@ public class CheckoutTokenService {
 
         if (checkoutToken != null && checkoutToken.getToken() == token) {
             if (checkoutToken.getExpiresAt().isAfter(LocalDateTime.now())) {
-                Settings settings = settingsService.getSettingsByUser(user);
-                if (settings != null) {
                     Subscription subscription = subscriptionService.getByUserId(user.getId());
                     if (subscription != null) {
                         subscriptionService.registerEmailVerifiedForUser(user);
                     } else {
                       throw new IllegalArgumentException("User has no subscription");
                     }
-                } else {
-                    throw new IllegalArgumentException("User has no settings assigned");
-                }
+
             } else {
                 return CheckoutTokenDto.builder().errorMessage("Token has expired, please try to verify your email again.").build();
             }
@@ -76,7 +67,6 @@ public class CheckoutTokenService {
 
     public int authenticationCode() {
         Random random = new Random();
-        int code = random.nextInt(9000) + 1000; // Generates a random number between 1000 and 9999 (inclusive)
-        return code;
+        return random.nextInt(9000) + 1000;
     }
 }

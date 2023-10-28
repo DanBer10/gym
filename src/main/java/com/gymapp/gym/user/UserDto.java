@@ -2,6 +2,7 @@ package com.gymapp.gym.user;
 
 
 
+import com.gymapp.gym.profile.ProfileDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,4 +17,5 @@ public class UserDto {
     private Role role;
     private Level level;
     private int socialId;
+    private ProfileDto profileDto;
 }

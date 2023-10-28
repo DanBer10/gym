@@ -23,6 +23,10 @@ public class SubscriptionService {
          final String email = request.getHeader("Email");
          User user = userService.getUserByEmail(email);
 
+         if (user == null) {
+             throw new IllegalArgumentException("User not found");
+         }
+
          Subscription subscription = subscriptionRepository.findByUserId(user.getId());
 
         return toSubscriptionDto(subscription);
@@ -31,11 +35,23 @@ public class SubscriptionService {
     public void subscribeToPremium(String email) {
         User user = userService.getUserByEmail(email);
 
-        if (!subscriptionRepository.existsByUserEmail(user.getEmail())) {
-            Subscription subscription = new Subscription();
+        if (subscriptionRepository.existsByUserEmail(user.getEmail())) {
+            Subscription subscription = subscriptionRepository.findByUserId(user.getId());
 
-            subscription.setUser(user);
             subscription.setSubscriptionType(SubscriptionType.PREMIUM);
+            subscription.setOne_time_payment(true);
+
+            subscriptionRepository.save(subscription);
+        }
+    }
+
+    public void subscribeToStandard(String email) {
+        User user = userService.getUserByEmail(email);
+
+        if (subscriptionRepository.existsByUserEmail(user.getEmail())) {
+            Subscription subscription = subscriptionRepository.findByUserId(user.getId());
+
+            subscription.setSubscriptionType(SubscriptionType.STANDARD);
             subscription.setOne_time_payment(true);
 
             subscriptionRepository.save(subscription);

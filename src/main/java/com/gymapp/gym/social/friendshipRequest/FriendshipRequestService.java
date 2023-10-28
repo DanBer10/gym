@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class FriendshipRequestService {
@@ -59,7 +58,7 @@ public class FriendshipRequestService {
         }
 
         if (optionalFriendshipRequest.get().getStatus().equals(FriendshipStatus.ACCEPTED)) {
-            throw new IllegalStateException("Friend request is already accepted");
+           return optionalFriendshipRequest.get();
         }
 
         FriendshipRequest friendshipRequest = optionalFriendshipRequest.get();
@@ -67,20 +66,6 @@ public class FriendshipRequestService {
         friendshipRequest.setStatus(FriendshipStatus.ACCEPTED);
 
         return repository.save(friendshipRequest);
-    }
-
-    public Set<FriendshipRequest> getFriendRequestsByUser(Integer socialId) {
-        Social user = socialService.getById(socialId);
-
-        if (user == null) {
-            throw new IllegalArgumentException("User doesn't exist");
-        }
-
-        Set<FriendshipRequest> friendRequestsList = new HashSet<>();
-
-        friendRequestsList.add(repository.getByReceiver(user));
-
-        return friendRequestsList;
     }
 
     public Set<FriendshipRequest> getFriendRequestsByUserAndStatus(Integer socialId, FriendshipStatus status) {
@@ -94,9 +79,6 @@ public class FriendshipRequestService {
             throw new IllegalArgumentException("Status is null");
         }
 
-        Set<FriendshipRequest> friendRequestsList =  repository.getByReceiverAndStatus(user, status);
-
-
-        return friendRequestsList;
+        return repository.getByReceiverAndStatus(user, status);
     }
 }

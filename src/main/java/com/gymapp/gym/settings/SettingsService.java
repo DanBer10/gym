@@ -13,6 +13,7 @@ import com.gymapp.gym.subscription.SubscriptionService;
 import com.gymapp.gym.user.User;
 import com.gymapp.gym.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -47,7 +48,6 @@ public class SettingsService {
         }
 
         String jwtToken = userService.updateUserEmail(user, newEmail);
-
         return new SettingsResponse.SettingsResponseBuilder().jwtToken(jwtToken).successMessage("Email updated.").build();
     }
 
@@ -135,7 +135,7 @@ public class SettingsService {
         }
 
         final int verificationCode = checkoutTokenService.createCheckoutTokenForUser(user).getToken();
-        final String mailSubject = "Your Verification Code " + verificationCode;
+        final String mailSubject = "Verify your email";
         final String mailText = "Click the link below to verify your email please <a href='http://localhost:4200/verify/" + verificationCode + "'>Verify Email</a>";
 
         if (verificationCode > 100) {
