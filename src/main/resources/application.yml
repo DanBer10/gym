@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: postgres://gym_db_d6a7_user:29kp0jCJ1EOahjGYXMjmyzGR94NXSXZ7@dpg-ckujf4jamefc738u2fcg-a/gym_db_d6a7
-    username: postgres
-    password: rootroot
+    url: jdbc:postgresql://gym_db_d6a7_user:29kp0jCJ1EOahjGYXMjmyzGR94NXSXZ7@dpg-ckujf4jamefc738u2fcg-a/gym_db_d6a7
+    username: gym_db_d6a7_user
+    password: 29kp0jCJ1EOahjGYXMjmyzGR94NXSXZ7
     driver-class-name: org.postgresql.Driver
   mail:
     host: smtp.gmail.com
