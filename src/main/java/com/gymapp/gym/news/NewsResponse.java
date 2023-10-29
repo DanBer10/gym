@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -14,4 +15,10 @@ import java.util.List;
 public class NewsResponse {
     private List<News> newsList;
     private String errorMessage;
+    private String title;
+    private String body;
+    private String category;
+    private String author;
+    private Date createdAt;
+    private String imageUrl;
 }

@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS plans (
     category VARCHAR(255) DEFAULT 'Strength',
     description VARCHAR(255) DEFAULT 'This is the strength plan',
     name VARCHAR(255) DEFAULT 'Strength',
-    subscription_type VARCHAR(255) DEFAULT 'BASIC' -- Use VARCHAR for storing enum
+    subscription_type VARCHAR(255) DEFAULT 'BASIC'
 );
 
 -- Insert a record into 'plans' with id=1 if it doesn't already exist

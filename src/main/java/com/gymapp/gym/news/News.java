@@ -1,13 +1,12 @@
 package com.gymapp.gym.news;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 @Data
 @Builder
@@ -21,5 +20,10 @@ public class News {
     private Integer id;
     private String body;
     private String title;
+    private String category;
+    private String author;
+    private String imageUrl;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
 
 }
