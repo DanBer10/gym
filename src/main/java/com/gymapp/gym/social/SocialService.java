@@ -282,6 +282,7 @@ public class SocialService {
             friendDto.setLevel(friendUser.getLevel());
             friendDto.setEmail(friendUser.getEmail());
             friendDto.setRole(friendUser.getRole());
+            friendDto.setProfileImageUrl(friendUser.getProfileImageUrl());
             SocialFriendsDto socialFriendsDto = new SocialFriendsDto();
             socialFriendsDto.setUserSocialId(friend.getId());
             socialFriendsDto.setUserInfo(friendDto);
