@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS notes (
     createdAt DATE,
     title VARCHAR(255) NULL,
     content TEXT,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES _user(id)
 );
 
 -- Add an index for faster queries on user_id
