@@ -62,10 +62,7 @@ public class PlansService {
         }
 
         if (userPlanProgression == null) {
-            List<String> planNotes = new ArrayList<>();
             PlanProgression planProgression = PlanProgression.builder().user(user).plan(planBySelectedPlan).day(1).build();
-            planProgression.setPlanNotes(planNotes);
-
             planProgressionRepository.save(planProgression);
         }
 

@@ -80,12 +80,10 @@
 			<version>RELEASE</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- Spring Boot Starter for Spring Mail -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
-		<!-- Other dependencies for your project -->
 	</dependencies>
 
 	<build>

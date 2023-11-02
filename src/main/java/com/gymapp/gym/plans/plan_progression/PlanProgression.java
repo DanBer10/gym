@@ -31,9 +31,4 @@ public class PlanProgression {
     private Plans plan;
 
     private int day;
-
-    @ElementCollection
-    @CollectionTable(name = "plan_notes", joinColumns = @JoinColumn(name = "plan_progression_id"))
-    @Column(name = "plan_note")
-    private List<String> planNotes = new ArrayList<>();
 }

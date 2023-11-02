@@ -2,6 +2,7 @@ package com.gymapp.gym.auth;
 
 import com.gymapp.gym.JWT.JwtService;
 import com.gymapp.gym.email.EmailService;
+import com.gymapp.gym.notes.NotesService;
 import com.gymapp.gym.subscription.SubscriptionService;
 import com.gymapp.gym.user.Level;
 import com.gymapp.gym.user.Role;
@@ -30,6 +31,8 @@ public class AuthenticationService {
     private final SubscriptionService subscriptionService;
     @Autowired
     private final EmailService emailService;
+    @Autowired
+    private final NotesService notesService;
 
 
     public AuthenticationResponse register(RegisterRequest request) {
@@ -42,6 +45,8 @@ public class AuthenticationService {
         String welcomeText = "Welcome aboard! 🌟 We're absolutely delighted to have you here! 🥳";
         String welcomeSubject = "Welcome to gym planet!🥳";
         emailService.addToEmailQueue(user.getEmail(), welcomeSubject, welcomeText);
+
+        notesService.createNotesForUser(user.getId());
 
         return AuthenticationResponse.builder().successMessage("Registered user successfully").email(user.getEmail()).build();
     }
