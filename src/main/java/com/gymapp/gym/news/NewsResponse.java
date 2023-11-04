@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 
 import java.util.Date;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NewsResponse {
-    private List<News> newsList;
+    private Page<News> newsList;
     private String errorMessage;
     private String title;
     private String body;
@@ -21,4 +22,5 @@ public class NewsResponse {
     private String author;
     private Date createdAt;
     private String imageUrl;
+    private long totalNews;
 }

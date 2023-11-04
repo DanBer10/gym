@@ -25,6 +25,8 @@ public class Notes {
 
     private String title;
 
+    private String category;
+
     // Using String for content, suitable for large text
     @Column(columnDefinition = "TEXT")
     private String content;
@@ -38,6 +40,7 @@ public class Notes {
         dto.setId(this.getId());
         dto.setTitle(this.getTitle());
         dto.setContent(this.getContent());
+        dto.setCategory(this.getCategory());
         return dto;
     }
 

@@ -22,7 +22,7 @@ public class NotesService {
     @Autowired
     private NotesRepository repository;
 
-    public PaginatedNotesResponse getAllNotesPaginated(HttpServletRequest request, Pageable pageable) {
+    public PaginatedNotesResponse getAllNotesPaginated(HttpServletRequest request, Pageable pageable, String category) {
         final String email = request.getHeader("Email");
         User user = userService.getUserByEmail(email);
 
@@ -30,7 +30,13 @@ public class NotesService {
             throw new RuntimeException("User not found or not authenticated");
         }
 
-        Page<Notes> notesPage = repository.findAllByUserId(user.getId(),pageable);
+        Page<Notes> notesPage;
+
+        if (category != null && category.isEmpty()) {
+            category = null;
+        }
+
+        notesPage = repository.findAllByUserIdAndCategory(user.getId(), category, pageable);
 
         long totalNotes = notesPage.getTotalElements();
         Page<NotesDto> notesDtoPage = notesPage.map(Notes::toDto);
@@ -41,6 +47,7 @@ public class NotesService {
 
         return response;
     }
+
 
 
     public void createNotesForUser(int userId) {
@@ -55,6 +62,7 @@ public class NotesService {
         notes.setCreatedAt(Date.from(Instant.now()));
         notes.setTitle(null);
         notes.setContent(null);
+        notes.setCategory(null);
         repository.save(notes);
     }
 
@@ -72,6 +80,7 @@ public class NotesService {
         notes.setCreatedAt(Date.from(Instant.now()));
         notes.setTitle(data.getTitle());
         notes.setContent(data.getContent());
+        notes.setCategory(data.getCategory());
 
         repository.save(notes);
 

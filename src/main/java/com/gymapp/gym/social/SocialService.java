@@ -104,12 +104,18 @@ public class SocialService {
             return SocialDto.builder().errorMessage("You are already friends with this user").build();
         }
 
+        if (userSocial == friendSocial) {
+            return SocialDto.builder().errorMessage("You can't add yourself as a friend").build();
+        }
+
         Optional<FriendshipRequest> existingFriendShipRequest = friendshipRequestService.getFriendShipRequestByReceiverAndSender(userSocial, friendSocial);
 
         if (existingFriendShipRequest.isPresent()) {
             friendshipRequestService.acceptFriendshipRequestByUsers(userSocial.getId(), friendSocial.getId());
             userSocial.getFriends().add(friendSocial);
+            friendSocial.getFriends().add(userSocial);
             repository.save(userSocial);
+            repository.save(friendSocial);
             return SocialDto.builder().build();
         }
 
@@ -160,8 +166,10 @@ public class SocialService {
         }
 
         userSocial.getFriends().add(friendSocial);
+        friendSocial.getFriends().add(userSocial);
 
         repository.save(userSocial);
+        repository.save(friendSocial);
 
         return toDto(userSocial);
     }

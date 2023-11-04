@@ -46,8 +46,6 @@ public class AuthenticationService {
         String welcomeSubject = "Welcome to gym planet!🥳";
         emailService.addToEmailQueue(user.getEmail(), welcomeSubject, welcomeText);
 
-        notesService.createNotesForUser(user.getId());
-
         return AuthenticationResponse.builder().successMessage("Registered user successfully").email(user.getEmail()).build();
     }
 

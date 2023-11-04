@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS notes (
     createdAt DATE,
     title VARCHAR(255) NULL,
     content TEXT,
+    category VARCHAR(255) NULL,
     FOREIGN KEY (user_id) REFERENCES _user(id)
 );
 

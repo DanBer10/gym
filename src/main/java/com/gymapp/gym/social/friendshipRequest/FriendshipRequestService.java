@@ -29,6 +29,10 @@ public class FriendshipRequestService {
             throw new IllegalArgumentException("User doesn't exist");
         }
 
+        if (userSocial == friendSocial) {
+            throw new IllegalArgumentException("Can't add yourself as friend");
+        }
+
         Optional<FriendshipRequest> existingFriendshipRequest = repository.findByReceiverAndSender(friendSocial, userSocial);
 
         if (existingFriendshipRequest.isPresent()) {
@@ -47,7 +51,7 @@ public class FriendshipRequestService {
         Social userSocial = socialService.getById(userSocialId);
         Social friendSocial = socialService.getById(friendSocialId);
 
-        if ( friendSocial == null) {
+        if (friendSocial == null || userSocial == null) {
             throw new IllegalArgumentException("One of the users doesn't exist: userSocialId=" + userSocialId + ", friendSocialId=" + friendSocialId);
         }
 

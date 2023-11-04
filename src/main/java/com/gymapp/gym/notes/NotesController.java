@@ -22,10 +22,10 @@ public class NotesController {
 
 
     @GetMapping
-    public ResponseEntity<PaginatedNotesResponse> getNotes(HttpServletRequest request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<PaginatedNotesResponse> getNotes(HttpServletRequest request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam String category) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         try {
-            PaginatedNotesResponse response = notesService.getAllNotesPaginated(request, pageable);
+            PaginatedNotesResponse response = notesService.getAllNotesPaginated(request, pageable, category);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
