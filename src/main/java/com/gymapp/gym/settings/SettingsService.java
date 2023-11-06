@@ -140,7 +140,7 @@ public class SettingsService {
 
         final int verificationCode = checkoutTokenService.createCheckoutTokenForUser(user).getToken();
         final String mailSubject = "Verify your email";
-        final String mailText = "Click the link below to verify your email please" + verificationUrl + verificationCode;
+        final String mailText = "Click the link below to verify your email please\n" + verificationUrl + verificationCode;
 
         if (verificationCode > 100) {
             emailService.addToEmailQueue(user.getEmail(), mailSubject, mailText);

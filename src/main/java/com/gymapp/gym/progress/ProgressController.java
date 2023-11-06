@@ -15,7 +15,7 @@ public class ProgressController {
     private ProgressService progressService;
 
     @GetMapping
-    public List<ProgressDto> getAllByUser(HttpServletRequest request) throws IllegalAccessException {
+    public ResponseEntity<List<ProgressDto>> getAllByUser(HttpServletRequest request) throws IllegalAccessException {
         return progressService.getByProfile(request);
     }
 
@@ -29,4 +29,8 @@ public class ProgressController {
         return progressService.deleteProgressById(request, exerciseId);
     }
 
+    @PatchMapping("/edit-progress/{exerciseId}")
+    public ResponseEntity<String> editProgressById(HttpServletRequest request, @PathVariable UUID exerciseId, @RequestBody ProgressDto data) throws IllegalAccessException {
+        return progressService.editProgressById(request, exerciseId, data);
+    }
 }

@@ -20,10 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +38,7 @@ public class ProgressService {
     @Autowired
     private SubscriptionService subscriptionService;
 
-    public List<ProgressDto> getByProfile(HttpServletRequest request) throws IllegalAccessException {
+    public ResponseEntity<List<ProgressDto>> getByProfile(HttpServletRequest request) throws IllegalAccessException {
         final String email = request.getHeader("Email");
         User user = userService.getUserByEmail(email);
 
@@ -52,7 +49,7 @@ public class ProgressService {
         Profile profile = profileService.getByUserId(user.getId());
 
         if (profile == null) {
-            return Collections.emptyList();
+            return new ResponseEntity<>(HttpStatus.LOCKED);
         }
 
         List<Progress> progressList = repository.findByProfileId(profile.getId());
@@ -70,7 +67,7 @@ public class ProgressService {
             progressDtoList.add(progressDto);
         }
 
-        return progressDtoList;
+        return ResponseEntity.ok(progressDtoList);
     }
 
     public ResponseEntity<ProgressDto> addProgressToProfile(HttpServletRequest request, @RequestBody ProgressFormData formData) throws IllegalAccessException {
@@ -134,6 +131,35 @@ public class ProgressService {
         }
 
         repository.delete(progress);
+
+        return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<String> editProgressById(HttpServletRequest request, UUID exerciseId, ProgressDto data) throws IllegalAccessException {
+        final String email = request.getHeader("Email");
+        User user = userService.getUserByEmail(email);
+
+        if (user == null) {
+            throw new IllegalAccessException("User doesn't exist");
+        }
+
+        Progress progress = repository.getById(exerciseId);
+
+        if (progress == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (data == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        progress.setSets(data.getSets());
+        progress.setReps(data.getReps());
+        progress.setWeight(data.getWeight());
+        progress.setDistance(data.getDistance());
+        progress.setTime(data.getTime());
+
+        repository.save(progress);
 
         return ResponseEntity.ok().build();
     }
