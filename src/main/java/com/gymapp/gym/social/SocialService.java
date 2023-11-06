@@ -283,41 +283,43 @@ public class SocialService {
         socialDto.setUserInfo(userDto);
 
         Set<SocialFriendsDto> socialFriends = new HashSet<>();
-        for (Social friend : social.getFriends()) {
+        if (social.getFriends() != null) {
+            for (Social friend : social.getFriends()) {
 
-            User friendUser = friend.getUser();
-            UserDto friendDto = new UserDto();
-            friendDto.setLevel(friendUser.getLevel());
-            friendDto.setEmail(friendUser.getEmail());
-            friendDto.setRole(friendUser.getRole());
-            friendDto.setProfileImageUrl(friendUser.getProfileImageUrl());
-            SocialFriendsDto socialFriendsDto = new SocialFriendsDto();
-            socialFriendsDto.setUserSocialId(friend.getId());
-            socialFriendsDto.setUserInfo(friendDto);
-            socialFriends.add(socialFriendsDto);
+                User friendUser = friend.getUser();
+                UserDto friendDto = new UserDto();
+                friendDto.setLevel(friendUser.getLevel());
+                friendDto.setEmail(friendUser.getEmail());
+                friendDto.setRole(friendUser.getRole());
+                friendDto.setProfileImageUrl(friendUser.getProfileImageUrl());
+                SocialFriendsDto socialFriendsDto = new SocialFriendsDto();
+                socialFriendsDto.setUserSocialId(friend.getId());
+                socialFriendsDto.setUserInfo(friendDto);
+                socialFriends.add(socialFriendsDto);
 
-            ProfileDto socialProfileDto = new ProfileDto();
-            Profile friendProfile = profileService.getByUserId(friendUser.getId());
+                ProfileDto socialProfileDto = new ProfileDto();
+                Profile friendProfile = profileService.getByUserId(friendUser.getId());
 
-            if (friendProfile != null) {
-                socialProfileDto.setGender(friendProfile.getGender());
-                socialProfileDto.setLanguage(friendProfile.getLanguage());
-                socialProfileDto.setNationality(friendProfile.getNationality());
-                socialProfileDto.setDateOfBirth(friendProfile.getDateOfBirth());
-                socialProfileDto.setDisplayName(friendProfile.getDisplayName());
-                socialFriendsDto.setProfileDto(socialProfileDto);
+                if (friendProfile != null) {
+                    socialProfileDto.setGender(friendProfile.getGender());
+                    socialProfileDto.setLanguage(friendProfile.getLanguage());
+                    socialProfileDto.setNationality(friendProfile.getNationality());
+                    socialProfileDto.setDateOfBirth(friendProfile.getDateOfBirth());
+                    socialProfileDto.setDisplayName(friendProfile.getDisplayName());
+                    socialFriendsDto.setProfileDto(socialProfileDto);
+                }
+
+                PlanProgression friendPlanProgression = planProgressionService.getPlanProgressionByUserId(friendUser.getId());
+
+                if (friendPlanProgression != null) {
+                    PlanProgressionDto friendPlanProgressionDto = new PlanProgressionDto();
+                    friendPlanProgressionDto.setDay(friendPlanProgression.getDay());
+                    friendPlanProgressionDto.setPlan(friendPlanProgression.getPlan());
+
+                    socialFriendsDto.setPlanProgressionDto(friendPlanProgressionDto);
+                }
+
             }
-
-            PlanProgression friendPlanProgression = planProgressionService.getPlanProgressionByUserId(friendUser.getId());
-
-            if (friendPlanProgression != null) {
-                PlanProgressionDto friendPlanProgressionDto = new PlanProgressionDto();
-                friendPlanProgressionDto.setDay(friendPlanProgression.getDay());
-                friendPlanProgressionDto.setPlan(friendPlanProgression.getPlan());
-
-                socialFriendsDto.setPlanProgressionDto(friendPlanProgressionDto);
-            }
-
         }
 
         socialDto.setFriends(socialFriends);
