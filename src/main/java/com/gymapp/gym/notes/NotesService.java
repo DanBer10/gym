@@ -84,7 +84,7 @@ public class NotesService {
 
         repository.save(notes);
 
-        NotesDto notesDto = NotesDto.builder().title(notes.getTitle()).content(notes.getContent()).build();
+        NotesDto notesDto = NotesDto.builder().title(notes.getTitle()).category(notes.getCategory()).content(notes.getContent()).build();
 
         return ResponseEntity.ok(notesDto);
     }
