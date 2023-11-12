@@ -143,7 +143,7 @@ public class NotificationsService {
             while (currentAttempt < maxAttempts) {
                 try {
                     notificationsRepository.save(notification);
-                    webSocketService.sendNotification(notification);
+                   // webSocketService.sendNotification(notification);
                     notificationQueue.poll(); // Remove the email only after it's successfully sent
                     log.info("Created notification from queue");
                     break;
