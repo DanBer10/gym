@@ -1,5 +1,8 @@
 package com.gymapp.gym.social;
 
+import com.gymapp.gym.notifications.Notifications;
+import com.gymapp.gym.notifications.NotificationsCategory;
+import com.gymapp.gym.notifications.NotificationsService;
 import com.gymapp.gym.plans.plan_progression.PlanProgression;
 import com.gymapp.gym.plans.plan_progression.PlanProgressionDto;
 import com.gymapp.gym.plans.plan_progression.PlanProgressionService;
@@ -45,6 +48,8 @@ public class SocialService {
     private ProfileService profileService;
     @Autowired
     private ProgressService progressService;
+    @Autowired
+    private NotificationsService notificationsService;
 
 
     public Social getById(int socialId) {
@@ -116,11 +121,11 @@ public class SocialService {
             friendSocial.getFriends().add(userSocial);
             repository.save(userSocial);
             repository.save(friendSocial);
+            notificationsService.createNotificationForUserSocial(friendSocial, userSocial, "Accepted friend request.", userSocial.getUser().getUsername() + " Added you as a friend", NotificationsCategory.SOCIAL);
             return SocialDto.builder().build();
         }
 
         User friend = userService.getUserByEmail(friendSocial.getUser().getEmail());
-
 
         if (friend != null) {
             friendshipRequestService.createFriendShipRequest(userSocial.getId(), friendSocialId);
@@ -170,6 +175,7 @@ public class SocialService {
 
         repository.save(userSocial);
         repository.save(friendSocial);
+        notificationsService.createNotificationForUserSocial(friendSocial, userSocial," Accepted your friend request.", null, NotificationsCategory.SOCIAL);
 
         return toDto(userSocial);
     }

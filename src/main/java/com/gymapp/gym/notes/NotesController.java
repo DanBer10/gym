@@ -32,7 +32,6 @@ public class NotesController {
         }
     }
 
-
     @PostMapping("/add-note")
     public ResponseEntity<?> addNewNoteForUser(HttpServletRequest request, @RequestBody NotesDto data) {
         return ResponseEntity.ok(notesService.addNewNoteForUser(request, data));

@@ -29,6 +29,8 @@ public class Settings {
     @OneToOne
     Profile profile;
 
+    private boolean allowNotifications;
+
     private boolean receiveEmails;
 
 

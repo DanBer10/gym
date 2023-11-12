@@ -48,25 +48,6 @@ public class NotesService {
         return response;
     }
 
-
-
-    public void createNotesForUser(int userId) {
-        User user = userService.getUserById(userId);
-
-        if (user == null) {
-            throw new RuntimeException("User was null when generating notes");
-        }
-
-        Notes notes = new Notes();
-        notes.setUser(user);
-        notes.setCreatedAt(Date.from(Instant.now()));
-        notes.setTitle(null);
-        notes.setContent(null);
-        notes.setCategory(null);
-        repository.save(notes);
-    }
-
-
     public ResponseEntity<NotesDto> addNewNoteForUser(HttpServletRequest request, NotesDto data) {
         final String email = request.getHeader("Email");
         User user = userService.getUserByEmail(email);

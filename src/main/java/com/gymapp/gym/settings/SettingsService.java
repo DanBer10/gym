@@ -121,7 +121,31 @@ public class SettingsService {
         settings.setReceiveEmails(selectedValue);
         settingsRepository.save(settings);
 
-        return new SettingsResponse.SettingsResponseBuilder().successMessage("Updated users email preferences").build();
+        return new SettingsResponse.SettingsResponseBuilder().successMessage("Updated email preferences").build();
+    }
+
+    public SettingsResponse allowNotificationsByUser(HttpServletRequest request, boolean selectedValue) {
+        final String email = request.getHeader("Email");
+        User user = userService.getUserByEmail(email);
+
+        if (user == null) {
+            return new SettingsResponse("No user found");
+        }
+
+        Settings settings = settingsRepository.getByUserEmail(email);
+
+        if (settings == null) {
+            return new SettingsResponse.SettingsResponseBuilder().errorMessage("User has no settings associated").build();
+        }
+
+        if (selectedValue == settings.isReceiveEmails()) {
+            return new SettingsResponse.SettingsResponseBuilder().errorMessage("User has selected already existing value").build();
+        }
+
+        settings.setAllowNotifications(selectedValue);
+        settingsRepository.save(settings);
+
+        return new SettingsResponse.SettingsResponseBuilder().successMessage("Updated notifications preferences").build();
     }
 
     public SettingsResponse sendVerificationEmailForUser(HttpServletRequest request) throws IllegalAccessException {
@@ -179,6 +203,7 @@ public class SettingsService {
         settingsDto.setSubscriptionType(settings.subscription.getSubscriptionType());
         settingsDto.setVerifiedEmail(settings.subscription.isVerified_email());
         settingsDto.setReceiveEmails(settings.isReceiveEmails());
+        settingsDto.setAllowNotifications(settings.isAllowNotifications());
         PlanProgression planProgression = planProgressionService.getPlanProgressionByUserId(settings.getUser().getId());
         if (planProgression != null) {
             PlanProgressionDto planProgressionDto = new PlanProgressionDto();

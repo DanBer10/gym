@@ -2,6 +2,8 @@ package com.gymapp.gym.progress;
 
 import com.gymapp.gym.exerciseType.ExerciseType;
 import com.gymapp.gym.exerciseType.ExerciseTypeService;
+import com.gymapp.gym.notifications.NotificationsCategory;
+import com.gymapp.gym.notifications.NotificationsService;
 import com.gymapp.gym.profile.Profile;
 import com.gymapp.gym.profile.ProfileService;
 import com.gymapp.gym.subscription.Subscription;
@@ -18,10 +20,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @NoArgsConstructor
@@ -37,6 +38,8 @@ public class ProgressService {
     private ExerciseTypeService exerciseTypeService;
     @Autowired
     private SubscriptionService subscriptionService;
+    @Autowired
+    private NotificationsService notificationsService;
 
     public ResponseEntity<List<ProgressDto>> getByProfile(HttpServletRequest request) throws IllegalAccessException {
         final String email = request.getHeader("Email");
@@ -112,6 +115,8 @@ public class ProgressService {
         progressDto.setSets(progress.getSets());
         progressDto.setReps(progress.getReps());
         progressDto.setExerciseType(progress.getExerciseType());
+
+        notificationsService.addNotificationsToFriendlySendOutQueue(user, progress.getExerciseType().getName(), NotificationsCategory.PROGRESSION, Date.from(Instant.now()));
 
         return ResponseEntity.ok().body(progressDto);
     }

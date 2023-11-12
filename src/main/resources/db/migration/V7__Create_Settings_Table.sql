@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS settings (
     subscription_id INT,
     profile_id INT,
     receive_emails boolean NOT NULL,
+    allow_notifications boolean NOT NULL DEFAULT true,
     FOREIGN KEY (user_id) REFERENCES _user(id),
     FOREIGN KEY (subscription_id) REFERENCES subscription(id),
     FOREIGN KEY (profile_id) REFERENCES profile(id)
