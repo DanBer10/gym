@@ -1,5 +1,7 @@
 package com.gymapp.gym.social.friendshipRequest;
 
+import com.gymapp.gym.notifications.NotificationsCategory;
+import com.gymapp.gym.notifications.NotificationsService;
 import com.gymapp.gym.social.Social;
 import com.gymapp.gym.social.SocialService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,8 @@ public class FriendshipRequestService {
     private FriendshipRequestRepository repository;
     @Autowired
     private SocialService socialService;
+    @Autowired
+    private NotificationsService notificationsService;
 
 
     public Optional<FriendshipRequest> getFriendShipRequestByReceiverAndSender(Social userSocial, Social friendSocial) {
@@ -45,6 +49,7 @@ public class FriendshipRequestService {
         friendshipRequest.setStatus(FriendshipStatus.PENDING);
 
         repository.save(friendshipRequest);
+        notificationsService.createNotificationForUserSocial(friendSocial, userSocial, "New friend request.", userSocial.getUser().getUsername() + " Added you as a friend", NotificationsCategory.SOCIAL);
     }
 
     public FriendshipRequest acceptFriendshipRequestByUsers(Integer userSocialId, Integer friendSocialId) {

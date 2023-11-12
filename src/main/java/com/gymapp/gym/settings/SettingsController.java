@@ -27,6 +27,11 @@ public class SettingsController {
         return ResponseEntity.ok(settingsService.receiveEmailsByUser(request, selectedValue));
     }
 
+    @PatchMapping("/allow-notifications")
+    public ResponseEntity<SettingsResponse> allowNotificationsForUser(HttpServletRequest request, @RequestBody boolean selectedValue) {
+        return ResponseEntity.ok(settingsService.allowNotificationsByUser(request, selectedValue));
+    }
+
     @PostMapping("/change-language")
     public ResponseEntity<SettingsResponse> changeLanguage(HttpServletRequest request, @RequestBody String language) {
         if (language == null) {

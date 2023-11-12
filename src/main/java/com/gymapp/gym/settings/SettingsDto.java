@@ -17,7 +17,8 @@ public class SettingsDto {
     private SubscriptionType subscriptionType;
     private boolean verifiedEmail;
     private String language;
-    private Boolean receiveEmails;
+    private boolean receiveEmails;
     private PlanProgressionDto planProgressionDto;
     private Plans plan;
+    private boolean allowNotifications;
 }

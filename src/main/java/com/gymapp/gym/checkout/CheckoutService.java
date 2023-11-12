@@ -56,7 +56,7 @@ public class CheckoutService {
             throw new IllegalAccessException("No user buy this request");
         }
 
-        String displayName = profileService.getProfileName(user);
+        String displayName = profileService.getProfileEmailAdress(user);
         // Create a customer using the provided Stripe token
         Customer customer = Customer.create(new CustomerCreateParams.Builder()
                 .setEmail(email)

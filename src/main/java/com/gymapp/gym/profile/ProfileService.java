@@ -26,14 +26,19 @@ public class ProfileService {
         return new ProfileResponse(profile);
     }
 
-    public String getProfileName(@NonNull User user) {
+    public String getProfileEmailAdress(@NonNull User user) {
         User userByEmail = userRepository.getUserByEmail(user.getEmail());
 
         if (userByEmail == null) {
-            return "No profile created for this user.";
+            return null;
         }
 
         return userByEmail.getEmail();
+    }
+
+
+    public String getProfileDisplayName(@NonNull String email) {
+        return repository.findByUserEmail(email).getDisplayName();
     }
 
     public ProfileResponse profileStatus(@NonNull HttpServletRequest request) {
