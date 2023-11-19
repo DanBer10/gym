@@ -2,19 +2,28 @@ package com.gymapp.gym.profile;
 
 import com.gymapp.gym.user.User;
 import com.gymapp.gym.user.UserRepository;
+import com.gymapp.gym.userAnalytics.UserAnalytics;
+import com.gymapp.gym.userAnalytics.UserAnalyticsService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.time.Instant;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
+    @Autowired
     private final ProfileRepository repository;
+    @Autowired
     private final UserRepository userRepository;
+    @Autowired
+    private final UserAnalyticsService userAnalyticsService;
 
     public ProfileResponse getProfileByDisplayName(@NonNull String displayName) {
         Profile profile = repository.findByDisplayName(displayName);
@@ -76,17 +85,21 @@ public class ProfileService {
 
         repository.save(profile);
 
+        UserAnalytics userAnalytics = new UserAnalytics();
+        userAnalytics.setInitialUserWeight(Double.parseDouble(profileDto.getWeight()));
+        userAnalyticsService.createUserAnalyticsForUser(userAnalytics);
+
         return new ProfileResponse(profileDto);
     }
 
-    public ProfileResponse updateProfileLanguageForUser(@NonNull User user, @NonNull String language) {
+    public void updateProfileLanguageForUser(@NonNull User user, @NonNull String language) {
                 Profile profile = repository.getByUserId(user.getId());
                 if (profile != null) {
                     profile.setLanguage(language);
                     repository.save(profile);
                 }
 
-         return new ProfileResponse(profile);
+        new ProfileResponse(profile);
     }
 
     public Profile getByUserId(Integer id) {

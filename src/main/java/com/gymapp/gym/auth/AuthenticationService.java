@@ -8,6 +8,7 @@ import com.gymapp.gym.user.Level;
 import com.gymapp.gym.user.Role;
 import com.gymapp.gym.user.User;
 import com.gymapp.gym.user.UserRepository;
+import com.gymapp.gym.userAnalytics.UserAnalyticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,9 +32,6 @@ public class AuthenticationService {
     private final SubscriptionService subscriptionService;
     @Autowired
     private final EmailService emailService;
-    @Autowired
-    private final NotesService notesService;
-
 
     public AuthenticationResponse register(RegisterRequest request) {
         var user = User.builder().email(request.getEmail().toLowerCase()).password(passwordEncoder.encode(request.getPassword())).role(Role.USER).level(Level.BRONZE).build();

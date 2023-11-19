@@ -11,6 +11,8 @@ import com.gymapp.gym.subscription.SubscriptionService;
 import com.gymapp.gym.subscription.SubscriptionType;
 import com.gymapp.gym.user.User;
 import com.gymapp.gym.user.UserService;
+import com.gymapp.gym.userAnalytics.UserAnalytics;
+import com.gymapp.gym.userAnalytics.UserAnalyticsService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -40,6 +42,8 @@ public class ProgressService {
     private SubscriptionService subscriptionService;
     @Autowired
     private NotificationsService notificationsService;
+    @Autowired
+    private UserAnalyticsService userAnalyticsService;
 
     public ResponseEntity<List<ProgressDto>> getByProfile(HttpServletRequest request) throws IllegalAccessException {
         final String email = request.getHeader("Email");
@@ -91,7 +95,6 @@ public class ProgressService {
             return ResponseEntity.badRequest().build();
         }
 
-        Subscription userSubscription = subscriptionService.getByUserId(user.getId());
         List<Progress> allByProfile =  repository.getAllByProfileId(profile.getId());
 
         for (Progress pr : allByProfile) {
@@ -99,6 +102,7 @@ public class ProgressService {
                 return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
             }
         }
+        Subscription userSubscription = subscriptionService.getByUserId(user.getId());
 
         if (userSubscription.getSubscriptionType().equals(SubscriptionType.BASIC) && allByProfile.size() >= 9) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -117,6 +121,16 @@ public class ProgressService {
         progressDto.setExerciseType(progress.getExerciseType());
 
         notificationsService.addNotificationsToFriendlySendOutQueue(user, progress.getExerciseType().getName(), NotificationsCategory.PROGRESSION, Date.from(Instant.now()));
+
+        UserAnalytics userAnalytics = new UserAnalytics();
+        userAnalytics.setUser(user);
+        userAnalytics.setExerciseType(progress.getExerciseType().getName());
+        userAnalytics.setInitialUserWeight(Double.parseDouble(profile.getWeight()));
+        userAnalytics.setInitialProgressReps(progress.getReps());
+        userAnalytics.setInitialProgressWeight(progress.getWeight());
+        userAnalytics.setInitialProgressSets(progress.getSets());
+
+        userAnalyticsService.createUserAnalyticsForUser(userAnalytics);
 
         return ResponseEntity.ok().body(progressDto);
     }
@@ -166,8 +180,19 @@ public class ProgressService {
 
         repository.save(progress);
 
+        UserAnalytics userAnalytics = new UserAnalytics();
+        userAnalytics.setUser(user);
+        userAnalytics.setCurrentUserWeight(Double.parseDouble(profileService.getByUserId(user.getId()).getWeight()));
+        userAnalytics.setCurrentProgressWeight(data.getWeight());
+        userAnalytics.setCurrentProgressReps(data.getReps());
+        userAnalytics.setCurrentProgressSets(data.getSets());
+        userAnalytics.setExerciseType(progress.getExerciseType().getName());
+
+        userAnalyticsService.newUpdatedUserAnalyticsForUser(userAnalytics);
+
         return ResponseEntity.ok().build();
     }
+
 
     public List<Progress> getAllProgressByProfileId(int id) {
       return repository.getAllByProfileId(id);
