@@ -137,14 +137,14 @@ public class NotificationsService {
 
     public void sendNextNotificationInQueue() {
         if (!notificationQueue.isEmpty()) {
-            Notifications notification = notificationQueue.peek(); // Peek at the next notification without removing it
-            int maxAttempts = 3; // Set the maximum number of retry attempts
+            Notifications notification = notificationQueue.peek();
+            int maxAttempts = 3;
             int currentAttempt = 0;
             while (currentAttempt < maxAttempts) {
                 try {
                     notificationsRepository.save(notification);
                    // webSocketService.sendNotification(notification);
-                    notificationQueue.poll(); // Remove the email only after it's successfully sent
+                    notificationQueue.poll();
                     log.info("Created notification from queue");
                     break;
                 } catch (Exception e) {
