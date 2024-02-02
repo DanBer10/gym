@@ -3,6 +3,7 @@ package com.gymapp.gym.auth;
 import com.gymapp.gym.JWT.JwtService;
 import com.gymapp.gym.email.EmailService;
 import com.gymapp.gym.notes.NotesService;
+import com.gymapp.gym.social.SocialService;
 import com.gymapp.gym.subscription.SubscriptionService;
 import com.gymapp.gym.user.Level;
 import com.gymapp.gym.user.Role;
@@ -32,6 +33,8 @@ public class AuthenticationService {
     private final SubscriptionService subscriptionService;
     @Autowired
     private final EmailService emailService;
+    @Autowired
+    private final SocialService socialService;
 
     public AuthenticationResponse register(RegisterRequest request) {
         var user = User.builder().email(request.getEmail().toLowerCase()).password(passwordEncoder.encode(request.getPassword())).role(Role.USER).level(Level.BRONZE).build();
@@ -42,7 +45,9 @@ public class AuthenticationService {
         subscriptionService.subscribeToBasic(user.getEmail());
         String welcomeText = "Welcome aboard! 🌟 We're absolutely delighted to have you here! 🥳";
         String welcomeSubject = "Welcome to gym planet!🥳";
+
         emailService.addToEmailQueue(user.getEmail(), welcomeSubject, welcomeText);
+        socialService.createSocialForUser(user);
 
         return AuthenticationResponse.builder().successMessage("Registered user successfully").email(user.getEmail()).build();
     }

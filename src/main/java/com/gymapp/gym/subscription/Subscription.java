@@ -18,8 +18,8 @@ public class Subscription {
     @GeneratedValue
     private Integer id;
 
-    @Enumerated(EnumType.STRING) // Specify EnumType.STRING to store enum values as strings
-    @Column(name = "subscription_type") // Name of the database column
+    @Enumerated(EnumType.STRING)
+    @Column(name = "subscription_type")
     private SubscriptionType subscriptionType;
 
     @ManyToOne

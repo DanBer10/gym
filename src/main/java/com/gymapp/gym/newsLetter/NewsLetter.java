@@ -12,7 +12,7 @@ public class NewsLetter {
     @GeneratedValue
     private Integer id;
     private String email;
-    @ManyToOne // Establishes Many-to-One relationship with User
-    @JoinColumn(name = "user_id") // This column will store the foreign key to the User table
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 }

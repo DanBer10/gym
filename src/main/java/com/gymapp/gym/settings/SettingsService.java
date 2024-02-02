@@ -138,7 +138,7 @@ public class SettingsService {
             return new SettingsResponse.SettingsResponseBuilder().errorMessage("User has no settings associated").build();
         }
 
-        if (selectedValue == settings.isReceiveEmails()) {
+        if (selectedValue == settings.isAllowNotifications()) {
             return new SettingsResponse.SettingsResponseBuilder().errorMessage("User has selected already existing value").build();
         }
 

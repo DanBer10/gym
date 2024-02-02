@@ -27,7 +27,6 @@ public class Notes {
 
     private String category;
 
-    // Using String for content, suitable for large text
     @Column(columnDefinition = "TEXT")
     private String content;
 

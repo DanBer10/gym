@@ -16,7 +16,6 @@ public class SettingsResponse {
     private String jwtToken;
     private String userLanguage;
 
-    // Constructor for error response
     public SettingsResponse(String errorMessage) {
         this.errorMessage = errorMessage;
     }

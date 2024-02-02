@@ -31,9 +31,6 @@ public class NotificationsService {
     @Autowired
     private ProfileService profileService;
     private Queue<Notifications> notificationQueue = new LinkedList<>();
-    @Autowired
-    private WebSocketService webSocketService;
-
 
     public void createNotificationForUserSocial(Social toSocial, Social fromSocial, String title, String text, NotificationsCategory category) {
         if (toSocial == null) {
@@ -63,7 +60,7 @@ public class NotificationsService {
         User user = userService.getUserByEmail(email);
 
         if (user == null) {
-            throw new RuntimeException("No user found when trying to fetch notifications");
+            return Collections.emptyList();
         }
 
         Social social = socialService.getByUserId(user.getId());
@@ -143,7 +140,6 @@ public class NotificationsService {
             while (currentAttempt < maxAttempts) {
                 try {
                     notificationsRepository.save(notification);
-                   // webSocketService.sendNotification(notification);
                     notificationQueue.poll();
                     log.info("Created notification from queue");
                     break;

@@ -12,11 +12,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/api/v1/notes")
 public class NotesController {
-
     @Autowired
     private NotesService notesService;
 
@@ -35,6 +35,15 @@ public class NotesController {
     @PostMapping("/add-note")
     public ResponseEntity<?> addNewNoteForUser(HttpServletRequest request, @RequestBody NotesDto data) {
         return ResponseEntity.ok(notesService.addNewNoteForUser(request, data));
+    }
+
+    @DeleteMapping("/delete-note/{noteId}")
+    public ResponseEntity<Boolean> deleteNoteforUser(HttpServletRequest request, @PathVariable UUID noteId) {
+        boolean success = notesService.deleteNoteForUser(request, noteId);
+        if (success) {
+            return ResponseEntity.ok(true);
+        }
+        return ResponseEntity.ok(false);
     }
 
 }

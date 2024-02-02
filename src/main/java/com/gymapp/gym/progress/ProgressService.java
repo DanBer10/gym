@@ -45,7 +45,7 @@ public class ProgressService {
     @Autowired
     private UserAnalyticsService userAnalyticsService;
 
-    public ResponseEntity<List<ProgressDto>> getByProfile(HttpServletRequest request) throws IllegalAccessException {
+    public List<ProgressDto> getByProfile(HttpServletRequest request) throws IllegalAccessException {
         final String email = request.getHeader("Email");
         User user = userService.getUserByEmail(email);
 
@@ -56,12 +56,11 @@ public class ProgressService {
         Profile profile = profileService.getByUserId(user.getId());
 
         if (profile == null) {
-            return new ResponseEntity<>(HttpStatus.LOCKED);
+            return Collections.emptyList();
         }
 
         List<Progress> progressList = repository.findByProfileId(profile.getId());
         List<ProgressDto> progressDtoList = new ArrayList<>();
-
         for (Progress progress: progressList) {
             ProgressDto progressDto = new ProgressDto();
             progressDto.setExerciseType(progress.getExerciseType());
@@ -74,7 +73,7 @@ public class ProgressService {
             progressDtoList.add(progressDto);
         }
 
-        return ResponseEntity.ok(progressDtoList);
+        return progressDtoList;
     }
 
     public ResponseEntity<ProgressDto> addProgressToProfile(HttpServletRequest request, @RequestBody ProgressFormData formData) throws IllegalAccessException {

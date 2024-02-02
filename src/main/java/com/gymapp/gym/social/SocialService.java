@@ -53,12 +53,29 @@ public class SocialService {
 
 
     public Social getById(int socialId) {
-        Social social = repository.getById(socialId);
-        return social;
+        return repository.getById(socialId);
     }
 
     public Social getByUserId(int userId) {
         return repository.getByUserId(userId);
+    }
+
+    public void createSocialForUser(User user) {
+        user = userService.getUserById(user.getId());
+
+        if (user == null) {
+            throw new IllegalArgumentException("User not found when trying to add social entity");
+        }
+
+        Social social = repository.getByUserId(user.getId());
+
+        if (social != null) {
+            throw new RuntimeException("User already has social");
+        }
+
+        social = Social.builder().user(user).id(generateRandomSocialId()).build();
+
+        repository.save(social);
     }
 
     public SocialDto getOrCreateSocialForUser(@NotNull HttpServletRequest request) {
@@ -113,16 +130,10 @@ public class SocialService {
             return SocialDto.builder().errorMessage("You can't add yourself as a friend").build();
         }
 
-        Optional<FriendshipRequest> existingFriendShipRequest = friendshipRequestService.getFriendShipRequestByReceiverAndSender(userSocial, friendSocial);
+        Optional<FriendshipRequest> existingFriendShipRequest = friendshipRequestService.getFriendShipRequestByReceiverAndSender(friendSocial, userSocial);
 
         if (existingFriendShipRequest.isPresent()) {
-            friendshipRequestService.acceptFriendshipRequestByUsers(userSocial.getId(), friendSocial.getId());
-            userSocial.getFriends().add(friendSocial);
-            friendSocial.getFriends().add(userSocial);
-            repository.save(userSocial);
-            repository.save(friendSocial);
-            notificationsService.createNotificationForUserSocial(friendSocial, userSocial, "Accepted friend request.", userSocial.getUser().getUsername() + " Added you as a friend", NotificationsCategory.SOCIAL);
-            return SocialDto.builder().build();
+            return SocialDto.builder().errorMessage("You have already sent a friendrequest to this user").build();
         }
 
         User friend = userService.getUserByEmail(friendSocial.getUser().getEmail());
@@ -198,7 +209,7 @@ public class SocialService {
         Profile profile = profileService.getByUserId(social.getUser().getId());
 
         if (profile == null) {
-            throw new IllegalArgumentException("Profile doesn't exist");
+            return Collections.emptyList();
         }
 
         List<Progress> progress = progressService.getAllProgressByProfileId(profile.getId());

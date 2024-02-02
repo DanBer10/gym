@@ -1,5 +1,6 @@
 package com.gymapp.gym.profile;
 
+import com.gymapp.gym.social.SocialService;
 import com.gymapp.gym.user.User;
 import com.gymapp.gym.user.UserRepository;
 import com.gymapp.gym.userAnalytics.UserAnalytics;
@@ -11,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
-import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -45,7 +44,6 @@ public class ProfileService {
         return userByEmail.getEmail();
     }
 
-
     public String getProfileDisplayName(@NonNull String email) {
         return repository.findByUserEmail(email).getDisplayName();
     }
@@ -70,7 +68,6 @@ public class ProfileService {
 
         boolean profileExists = repository.existsByUserEmail(email);
         if (profileExists) {
-            // Handle the case when the profile already exists
             return new ProfileResponse("Profile already created for " + email);
         }
 

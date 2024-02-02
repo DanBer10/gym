@@ -1,6 +1,7 @@
 package com.gymapp.gym.user;
 
 import com.gymapp.gym.JWT.JwtService;
+import com.gymapp.gym.social.SocialService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     @Autowired
     private final JwtService jwtService;
-
 
     public User getUserByEmail(@NonNull String email) {
         return repo.getUserByEmail(email);
@@ -57,7 +57,7 @@ public class UserService {
         return ResponseEntity.ok().build();
     }
 
-    public String updateUserEmail (@NonNull User user, @NonNull String newEmail) {
+    public String updateUserEmail(@NonNull User user, @NonNull String newEmail) {
         user.setEmail(newEmail);
         repo.save(user);
 

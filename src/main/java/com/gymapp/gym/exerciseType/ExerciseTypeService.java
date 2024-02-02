@@ -14,7 +14,7 @@ public class ExerciseTypeService {
         if (exerciseType == null) {
             ExerciseType newExerciseType = new ExerciseType();
             newExerciseType.setName(exerciseName);
-            exerciseType = repository.save(newExerciseType); // Save and update the exerciseType
+            exerciseType = repository.save(newExerciseType);
         }
 
         return exerciseType;

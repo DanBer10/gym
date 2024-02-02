@@ -57,7 +57,6 @@ public class CheckoutService {
         }
 
         String displayName = profileService.getProfileEmailAdress(user);
-        // Create a customer using the provided Stripe token
         Customer customer = Customer.create(new CustomerCreateParams.Builder()
                 .setEmail(email)
                 .setName(displayName)

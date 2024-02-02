@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,5 +70,23 @@ public class NotesService {
         NotesDto notesDto = NotesDto.builder().title(notes.getTitle()).category(notes.getCategory()).content(notes.getContent()).build();
 
         return ResponseEntity.ok(notesDto);
+    }
+
+    public boolean deleteNoteForUser(HttpServletRequest request, UUID noteId) {
+        final String email = request.getHeader("email");
+        User user = userService.getUserByEmail(email);
+
+        if (user == null) {
+            throw new RuntimeException("No user was found");
+        }
+
+        Optional<Notes> note = repository.findById(noteId);
+
+        if (note.isPresent()) {
+            this.repository.delete(note.get());
+            return true;
+        } else {
+            return false;
+        }
     }
 }

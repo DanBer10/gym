@@ -30,7 +30,6 @@ public class EmailService {
             javaMailSender.send(message);
         } catch (MailException e) {
             log.error("Failed to send email: {}", e.getMessage());
-            // You might want to handle the error, such as by retrying or logging it.
         }
     }
 
@@ -49,14 +48,14 @@ public class EmailService {
 
     public void sendNextEmailInQueue() {
         if (!emailQueue.isEmpty()) {
-            SimpleMailMessage nextEmail = emailQueue.peek(); // Peek at the next email without removing it
+            SimpleMailMessage nextEmail = emailQueue.peek();
             try {
                 javaMailSender.send(nextEmail);
-                emailQueue.poll(); // Remove the email only after it's successfully sent
+                emailQueue.poll();
                 log.info("Sent email: {}", nextEmail);
             } catch (MailException e) {
                 log.error("Failed to send email: {}", e.getMessage());
-                // You might want to handle the error, such as by retrying or logging it.
+
             }
         }
     }

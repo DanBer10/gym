@@ -10,6 +10,4 @@ import java.util.List;
 public class PaginatedNotesResponse {
     private List<NotesDto> notes;
     private long totalNotes;
-
-    // Constructors, getters, and setters
 }

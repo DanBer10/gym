@@ -19,10 +19,8 @@ public class FriendshipRequestService {
     private NotificationsService notificationsService;
 
 
-    public Optional<FriendshipRequest> getFriendShipRequestByReceiverAndSender(Social userSocial, Social friendSocial) {
-
-        return repository.findByReceiverAndSender(userSocial, friendSocial);
-
+    public Optional<FriendshipRequest> getFriendShipRequestByReceiverAndSender(Social friendSocial, Social userSocial) {
+        return repository.findByReceiverAndSender(friendSocial, userSocial);
     }
 
     public void createFriendShipRequest(int userSocialId, int friendSocialId ) {
@@ -37,7 +35,7 @@ public class FriendshipRequestService {
             throw new IllegalArgumentException("Can't add yourself as friend");
         }
 
-        Optional<FriendshipRequest> existingFriendshipRequest = repository.findByReceiverAndSender(friendSocial, userSocial);
+        Optional<FriendshipRequest> existingFriendshipRequest = getFriendShipRequestByReceiverAndSender(friendSocial, userSocial);
 
         if (existingFriendshipRequest.isPresent()) {
             return;
@@ -60,7 +58,7 @@ public class FriendshipRequestService {
             throw new IllegalArgumentException("One of the users doesn't exist: userSocialId=" + userSocialId + ", friendSocialId=" + friendSocialId);
         }
 
-        Optional<FriendshipRequest> optionalFriendshipRequest = repository.findByReceiverAndSender(userSocial, friendSocial);
+        Optional<FriendshipRequest> optionalFriendshipRequest = getFriendShipRequestByReceiverAndSender(friendSocial, userSocial);
 
         if (optionalFriendshipRequest.isEmpty()) {
            throw new IllegalArgumentException("No friend request was found");

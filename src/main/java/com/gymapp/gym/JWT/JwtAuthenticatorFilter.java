@@ -27,7 +27,6 @@ public class JwtAuthenticatorFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        // Allow registration requests to pass through without authentication
         if (request.getRequestURI().equals("/api/v1/auth/register")) {
             filterChain.doFilter(request, response);
             return;
